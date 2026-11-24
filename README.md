@@ -10,7 +10,7 @@ incremental `rsync` backups on the schedule you set.
 - No database server, no agent fleet, no external services
 
 > This app has **no built-in login**. It is meant for a trusted network. Keep it
-> on a LAN/VPN or firewall port 8000 (see [Security](#security)).
+> on a LAN/VPN or firewall port 8009 (see [Security](#security)).
 
 ---
 
@@ -32,7 +32,7 @@ That's it. The installer:
 1. `apt-get` installs `rsync`, `python3`, `python3-venv`, `python3-pip`.
 2. Creates a virtualenv and installs the Python requirements.
 3. Writes `/etc/mountguard-backup.env` and a systemd unit, then starts the service.
-4. Prints the dashboard URL, e.g. `http://<server-ip>:8000`.
+4. Prints the dashboard URL, e.g. `http://<server-ip>:8009`.
 
 Open that URL in a browser, click **Create Backup Job**, and you're backing up.
 
@@ -78,14 +78,14 @@ Everything lives in `/etc/mountguard-backup.env` (see `.env.example`). Key value
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `BACKUP_UI_HOST` / `BACKUP_UI_PORT` | `0.0.0.0` / `8000` | bind address/port |
+| `BACKUP_UI_HOST` / `BACKUP_UI_PORT` | `0.0.0.0` / `8009` | bind address/port |
 | `BACKUP_UI_STATE_DIR` | `/var/lib/backup-ui` | SQLite `backup.db` |
 | `BACKUP_UI_LOG_DIR` | `/var/log/backup-ui` | per-run rsync logs |
 | `BACKUP_UI_TIMEZONE` | `America/Chicago` | default job timezone |
 | `BACKUP_UI_RSYNC` | `rsync` | rsync binary |
 | `BACKUP_UI_MAX_RUNS` | `50` | run history kept per job |
 
-Change the port (e.g. if 8000 is taken): edit `/etc/mountguard-backup.env`, then
+Change the port (e.g. if 8009 is taken): edit `/etc/mountguard-backup.env`, then
 `sudo systemctl restart mountguard-backup`.
 
 ---
@@ -95,8 +95,8 @@ Change the port (e.g. if 8000 is taken): edit `/etc/mountguard-backup.env`, then
 There is no authentication — anyone who can reach the port can manage backups.
 Choose one:
 
-- Keep the server on a private network / VPN and open port 8000 only there, or
-- Restrict with a firewall: `sudo ufw allow from 10.0.0.0/24 to any port 8000`, or
+- Keep the server on a private network / VPN and open port 8009 only there, or
+- Restrict with a firewall: `sudo ufw allow from 10.0.0.0/24 to any port 8009`, or
 - Put it behind a reverse proxy with TLS + basic auth / mTLS.
 
 The app does enforce CSRF + same-origin checks on all create/edit/delete/run actions.

@@ -2,7 +2,7 @@
 
 All paths and bind settings are read from the environment on every access so
 tests and deployments can override them without importing-time side effects.
-Defaults follow the architecture spec: bind 0.0.0.0:8000, state under
+Defaults follow the architecture spec: bind 0.0.0.0:8009, state under
 ``/var/lib/backup-ui``, logs under ``/var/log/backup-ui``.
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 # Defaults
 # ---------------------------------------------------------------------------
 DEFAULT_HOST = "0.0.0.0"
-DEFAULT_PORT = 8000
+DEFAULT_PORT = 8009
 DEFAULT_STATE_DIR = "/var/lib/backup-ui"
 DEFAULT_LOG_DIR = "/var/log/backup-ui"
 DEFAULT_TIMEZONE = "America/Chicago"

@@ -5,7 +5,7 @@
 #
 # Installs system deps, builds a virtualenv, writes a systemd service, and starts
 # it. It backs up paths ON THIS HOST. The web UI is reachable on all interfaces
-# by default (http://<this-host>:8000) — keep that on a trusted LAN/VPN or
+# by default (http://<this-host>:8009) — keep that on a trusted LAN/VPN or
 # firewall it. Docker is NOT required for this path (it is the recommended one).
 set -euo pipefail
 
@@ -37,7 +37,7 @@ if [ ! -f "$ENV_FILE" ]; then
   cat > "$ENV_FILE" <<'EOF'
 # MountGuard Backup configuration (sourced by run.sh / systemd).
 BACKUP_UI_HOST=0.0.0.0
-BACKUP_UI_PORT=8000
+BACKUP_UI_PORT=8009
 BACKUP_UI_STATE_DIR=/var/lib/backup-ui
 BACKUP_UI_LOG_DIR=/var/log/backup-ui
 BACKUP_UI_TIMEZONE=America/Chicago

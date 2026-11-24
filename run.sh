@@ -11,4 +11,4 @@ fi
 cd "$DIR"
 exec "$DIR/.venv/bin/uvicorn" app.main:app \
   --host "${BACKUP_UI_HOST:-0.0.0.0}" \
-  --port "${BACKUP_UI_PORT:-8000}"
+  --port "${BACKUP_UI_PORT:-8009}"
