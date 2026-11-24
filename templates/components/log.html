@@ -1,0 +1,27 @@
+{% from "components/icon.html" import icon %}
+{# log_panel(lines, title, action_html) — terminal panel. lines = [{text, cls}] #}
+{% macro log_panel(lines, title='Run Log', action_html='') -%}
+<div class="log-panel">
+  <div class="log-head">
+    {{ icon('database') }}
+    <strong style="font-family:var(--font-mono)">{{ title }}</strong>
+    <span class="spacer"></span>
+    {{ action_html | safe }}
+  </div>
+  <div class="log-body">
+    {%- if lines %}
+      {%- for line in lines %}
+        <div class="log-line {{ line.cls or '' }}">
+          <span class="ln">{{ loop.index }}</span>
+          <span class="lc">{{ line.text }}</span>
+        </div>
+      {%- endfor %}
+    {%- else %}
+      {# Sample monospace placeholder — never a blank visual field. #}
+      <div class="log-line stat"><span class="ln">1</span><span class="lc">$ rsync -aH --safe-links --keep-dirlinks /source/ /dest/</span></div>
+      <div class="log-line stat"><span class="ln">2</span><span class="lc"># No log output recorded for this run yet.</span></div>
+      <div class="log-line stat"><span class="ln">3</span><span class="lc"># Sample output shown while waiting for rsync results.</span></div>
+    {%- endif %}
+  </div>
+</div>
+{%- endmacro %}

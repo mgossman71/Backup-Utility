@@ -1,0 +1,17 @@
+{% from "components/icon.html" import icon %}
+{# status_pill(status) -> approved status label + matching icon + color class #}
+{% macro status_pill(status) -%}
+{%- if status == 'success' -%}
+  <span class="pill pill-success" role="status">{{ icon('check') }}{{ copy.status_success }}</span>
+{%- elif status == 'failure' -%}
+  <span class="pill pill-failure" role="status">{{ icon('warning') }}{{ copy.status_failure }}</span>
+{%- elif status == 'running' -%}
+  <span class="pill pill-running" role="status">{{ icon('refresh') }}{{ copy.status_running }}</span>
+{%- elif status == 'skipped' -%}
+  <span class="pill pill-warning" role="status">{{ icon('clock') }}{{ copy.status_skipped }}</span>
+{%- elif status == 'scheduled' -%}
+  <span class="pill pill-primary" role="status">{{ icon('clock') }}{{ copy.status_scheduled }}</span>
+{%- else -%}
+  <span class="pill pill-muted" role="status">{{ icon('info') }}{{ copy.status_no_runs }}</span>
+{%- endif -%}
+{%- endmacro %}

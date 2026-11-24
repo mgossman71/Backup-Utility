@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/card.html" import card %}
+{% block title %}{{ copy.settings }} · {{ brand_name }}{% endblock %}
+{% block body %}
+  <div class="page-head"><h1>{{ copy.settings }}</h1></div>
+
+  {% call card(copy.backup_jobs) %}
+    <dl class="defs">
+      <dt>{{ copy.hero_headline }}</dt>
+      <dd>{{ copy.hero_subhead }}</dd>
+    </dl>
+  {% endcall %}
+
+  {% call card(copy.run_history) %}
+    <p class="muted">{{ copy.contact_line }}</p>
+    <p class="muted">{{ copy.pricing_line }}</p>
+    <div class="kv-inline" style="margin-top:12px">
+      <span class="tag">{{ icon('lock') }} root / UID 0</span>
+      <span class="tag">{{ icon('server') }} rsync</span>
+      <span class="tag">{{ icon('clock') }} America/Chicago</span>
+    </div>
+  {% endcall %}
+{% endblock %}

@@ -1,0 +1,95 @@
+{# icon.html — inline SVG icon set. Stroke 1.5px, round caps, currentColor.
+   Usage: {{ icon('folder') }}  or  {{ icon('folder', 'ticon folder') }} #}
+{% macro icon(name, cls='') -%}
+<svg class="icon {{ cls }}" viewBox="0 0 24 24" width="20" height="20" fill="none"
+     stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" focusable="false">
+{%- if name == 'folder' -%}
+  <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+{%- elif name == 'folder-open' -%}
+  <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1H3z"/>
+  <path d="M3 10h18l-2 7.2a1.6 1.6 0 0 1-1.5 1.1H6.5A1.6 1.6 0 0 1 5 17.2z"/>
+{%- elif name == 'file' -%}
+  <path d="M13 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8z"/>
+  <path d="M13 3v5h5"/>
+{%- elif name == 'play' -%}
+  <path d="M7 5.5v13l11-6.5z"/>
+{%- elif name == 'refresh' -%}
+  <path d="M20 11a8 8 0 0 0-13.6-4.6L4 8"/><path d="M4 4v4h4"/>
+  <path d="M4 13a8 8 0 0 0 13.6 4.6L20 16"/><path d="M20 20v-4h-4"/>
+{%- elif name == 'delete' -%}
+  <path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  <path d="M6 7l1 12.5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1L18 7"/>
+{%- elif name == 'restore' -%}
+  <path d="M4 5v5h5"/><path d="M4.8 10a8 8 0 1 0 1.7-5.3L4 6"/>
+{%- elif name == 'check' -%}
+  <path d="M5 13l4 4 10-11"/>
+{%- elif name == 'warning' -%}
+  <path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5h.01"/>
+{%- elif name == 'clock' -%}
+  <circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>
+{%- elif name == 'lock' -%}
+  <rect x="5.5" y="11" width="13" height="8.5" rx="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+{%- elif name == 'database' -%}
+  <ellipse cx="12" cy="6" rx="8" ry="3"/>
+  <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
+  <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>
+{%- elif name == 'chevron' -%}
+  <path d="M9 6l6 6-6 6"/>
+{%- elif name == 'chevron-down' -%}
+  <path d="M6 9l6 6 6-6"/>
+{%- elif name == 'plus' -%}
+  <path d="M12 5v14"/><path d="M5 12h14"/>
+{%- elif name == 'home' -%}
+  <path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>
+{%- elif name == 'arrow-right' -%}
+  <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
+{%- elif name == 'server' -%}
+  <rect x="4" y="5" width="16" height="6" rx="1.5"/><rect x="4" y="13" width="16" height="6" rx="1.5"/>
+  <path d="M7.5 8h.01"/><path d="M7.5 16h.01"/>
+{%- elif name == 'info' -%}
+  <circle cx="12" cy="12" r="8"/><path d="M12 11v5"/><path d="M12 8h.01"/>
+{%- elif name == 'shield' -%}
+  <path d="M12 4l7 3v6c0 4-3 6.5-7 8-4-1.5-7-4-7-8V7z"/>
+{%- else -%}
+  <circle cx="12" cy="12" r="8"/>
+{%- endif -%}
+</svg>
+{%- endmacro %}
+
+{# Empty-state illustration: 80px line-art folder stack / vault in primary #}
+{% macro empty_art(kind='stack') -%}
+<svg viewBox="0 0 80 80" width="80" height="80" fill="none" stroke="#4F8CFF"
+     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+{%- if kind == 'vault' -%}
+  <rect x="14" y="16" width="52" height="48" rx="4"/>
+  <circle cx="40" cy="40" r="13"/>
+  <path d="M40 27v-4M40 57v-4M27 40h-4M57 40h-4"/>
+  <path d="M34 34l12 12"/>
+{%- else -%}
+  <path d="M18 26h16l4 4h24a4 4 0 0 1 4 4v4H18v-8a4 4 0 0 1 4-4z"/>
+  <path d="M18 38h44v14a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4z"/>
+  <path d="M30 45h12"/>
+{%- endif -%}
+</svg>
+{%- endmacro %}
+
+{# Sparkline bars for job cards: pass a list of (level 0..1, kind) tuples #}
+{% macro sparkline(values) -%}
+<svg class="spark" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Recent run activity">
+{%- if values %}
+  {%- set n = values | length %}
+  {%- for v in values %}
+    {%- set w = (100 / n) - 1.5 %}
+    {%- set x = loop.index0 * (100 / n) %}
+    {%- set h = (v.level * 32) | round | int %}
+    {%- set y = 36 - h %}
+    <rect class="{{ v.kind }}" x="{{ x | round | int }}" y="{{ y }}" width="{{ w | round | int }}" height="{{ h if h > 0 else 2 }}" rx="1"/>
+  {%- endfor %}
+{%- else %}
+  {%- for i in range(8) %}
+    <rect class="empty" x="{{ i * 12.5 }}" y="30" width="11" height="2" rx="1"/>
+  {%- endfor %}
+{%- endif %}
+</svg>
+{%- endmacro %}

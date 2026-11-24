@@ -1,0 +1,13 @@
+{% from "components/icon.html" import icon %}
+<header class="topbar">
+  <a class="brand" href="/">{{ icon('shield') }}<span>{{ brand_name }}</span></a>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">
+    {{ icon('chevron-down') }}
+  </button>
+  <nav class="nav" id="nav" aria-label="Primary">
+    <a href="/" class="{% if nav == 'dashboard' %}active{% endif %}">{{ copy.dashboard }}</a>
+    <a href="/jobs" class="{% if nav == 'jobs' %}active{% endif %}">{{ copy.backup_jobs }}</a>
+    <a href="/jobs/new" class="{% if nav == 'new' %}active{% endif %}">{{ copy.create_backup_job }}</a>
+    <a href="/settings" class="{% if nav == 'settings' %}active{% endif %}">{{ copy.settings }}</a>
+  </nav>
+</header>

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# App state / local runtime (never commit the live database or run logs)
+data/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+.writeable-probe
+
+# pytest / tooling
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local docker overrides
+docker-compose.yml
+.env

@@ -1,0 +1,12 @@
+{# card.html — card wrapper macro. Use with {% call card('Title') %}…{% endcall %} #}
+{% macro card(title='', actions='') -%}
+<section class="card">
+  {% if title or actions %}
+  <div class="card-head">
+    {% if title %}<h3>{{ title }}</h3>{% endif %}
+    {% if actions %}<div class="card-actions">{{ actions | safe }}</div>{% endif %}
+  </div>
+  {% endif %}
+  {{ caller() }}
+</section>
+{%- endmacro %}

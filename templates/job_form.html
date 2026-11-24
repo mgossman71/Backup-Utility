@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/form.html" import text_field, textarea_field, select_field, check_field %}
+{% from "partials/path_browser.html" import path_field %}
+{% block title %}{% if is_new %}{{ copy.create_backup_job }}{% else %}{{ copy.edit_backup_job }}{% endif %} · {{ brand_name }}{% endblock %}
+{% block body %}
+  <div class="page-head">
+    <span class="crumb">
+      <a href="/jobs">{{ copy.backup_jobs }}</a> {{ icon('chevron') }}
+      {% if is_new %}{{ copy.create_backup_job }}{% else %}{{ copy.edit_backup_job }}{% endif %}
+    </span>
+  </div>
+
+  {% if error %}
+    <div class="card" style="border-color:var(--danger);margin-bottom:18px">
+      <div class="row" style="display:flex;gap:10px;align-items:center;color:var(--danger)">
+        {{ icon('warning') }} <span>{{ error }}</span>
+      </div>
+    </div>
+  {% endif %}
+
+  <form id="saveform" method="post" action="{% if is_new %}/jobs{% else %}/jobs/{{ job.id }}{% endif %}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <section class="card">
+      <div class="card-head"><h3>{{ copy.job_details }}</h3></div>
+      <div class="grid two">
+        {{ text_field('name', copy.field_job_name, value=values.name, required=True,
+                      placeholder='Nightly /srv backup') }}
+        <div class="field">
+          <label class="switch" style="align-self:end">
+            <input type="checkbox" name="enabled" value="1"{% if values.enabled %} checked{% endif %}>
+            <span>{{ copy.label_enabled }}</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:var(--row-gap)">
+      <div class="card-head"><h3>{{ copy.source_selection }}</h3></div>
+      {{ path_field('source_path', copy.field_source_path, value=values.source_path,
+                    browse_label=copy.cta_browse_source, browse_kind='source',
+                    helper=copy.help_source_path, required=True,
+                    error=(error if error_field == 'source_path' else '')) }}
+    </section>
+
+    <section class="card" style="margin-top:var(--row-gap)">
+      <div class="card-head"><h3>{{ copy.destination_settings }}</h3></div>
+      {{ path_field('dest_root', copy.field_destination_path, value=values.dest_root,
+                    browse_label=copy.cta_browse_destination, browse_kind='dest',
+                    helper=copy.help_destination_path, required=True,
+                    error=(error if error_field == 'dest_root' else '')) }}
+      {{ text_field('dest_name_override', copy.field_dest_subfolder, value=values.dest_name_override,
+                    helper=copy.help_dest_subfolder, cls='input mono', placeholder='(source basename)') }}
+      {{ check_field('confirm_missing_destination', copy.label_confirm_missing_destination,
+                     checked=values.confirm_missing_destination) }}
+      {{ check_field('confirm_dest_inside_source', copy.label_confirm_dest_inside_source,
+                     checked=values.confirm_dest_inside_source) }}
+    </section>
+
+    <section class="card" style="margin-top:var(--row-gap)">
+      <div class="card-head"><h3>{{ copy.schedule }}</h3></div>
+      <div class="grid two">
+        {{ select_field('timezone', copy.field_timezone, timezone_options, selected=values.timezone) }}
+        {{ text_field('schedule_cron', copy.field_schedule_cron, value=values.schedule_cron,
+                      cls='input mono', helper=copy.help_schedule_cron, placeholder='0 2 * * *') }}
+      </div>
+      <div class="field">
+        <div class="helper">{{ copy.field_next_run }}:
+          {% if next_run %}<span class="mono">{{ next_run }}</span>{% else %}{{ copy.no_schedule_set }}{% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:var(--row-gap)">
+      <div class="card-head"><h3>{{ copy.exclusions }}</h3></div>
+      {{ textarea_field('exclusions', copy.exclusions, value=values.exclusions, helper=copy.help_exclusions, rows=4) }}
+      <div class="grid two">
+        <label class="switch"><input type="checkbox" name="metadata_mode" value="1"{% if values.metadata_mode %} checked{% endif %}><span>{{ copy.label_metadata_mode }}</span></label>
+        <label class="switch"><input type="checkbox" name="checksum_mode" value="1"{% if values.checksum_mode %} checked{% endif %}><span>{{ copy.label_checksum_mode }}</span></label>
+      </div>
+      <div style="margin-top:12px">
+        <label class="switch"><input type="checkbox" name="delete_mode" value="1"{% if values.delete_mode %} checked{% endif %}><span>{{ copy.label_delete_mode }}</span></label>
+        <div class="helper" style="margin:6px 0">{{ copy.help_delete_mode }}</div>
+        {{ check_field('confirm_delete_mode', copy.label_confirm_delete_mode, checked=values.confirm_delete_mode) }}
+      </div>
+    </section>
+
+    <div class="btn-row" style="margin-top:var(--row-gap)">
+      <button class="btn btn-primary" type="submit">{{ icon('check') }} {{ copy.cta_save_job }}</button>
+      <a class="btn btn-ghost" href="{% if is_new %}/jobs{% else %}/jobs/{{ job.id }}{% endif %}">{{ copy.cta_cancel }}</a>
+    </div>
+  </form>
+
+  {% if not is_new %}
+    <div class="btn-row" style="margin-top:var(--row-gap);padding-top:16px;border-top:1px solid var(--line)">
+      <form method="post" action="/jobs/{{ job.id }}/run" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-primary" type="submit">{{ icon('play') }} {{ copy.cta_run_job_now }}</button>
+      </form>
+      <form method="post" action="/jobs/{{ job.id }}/delete" style="display:inline"
+            data-confirm="{{ copy.cta_delete_job }}"
+            data-confirm-message="This removes the job record only. Source and backup files are left untouched."
+            data-confirm-label="{{ copy.cta_confirm_job_deletion }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-danger" type="submit">{{ icon('delete') }} {{ copy.cta_delete_job }}</button>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/js/browse.js" defer></script>{% endblock %}

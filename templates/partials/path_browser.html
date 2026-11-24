@@ -1,0 +1,21 @@
+{# partials/path_browser.html — a path input + Browse button that opens a lazy
+   directory picker (static/js/browse.js) fetching /api/tree one level at a time. #}
+{% from "components/icon.html" import icon %}
+
+{% macro path_field(name, label, value='', browse_label='Browse', browse_kind='dest', helper='', required=True, error='') -%}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <div class="browse-row">
+    <input id="{{ name }}" name="{{ name }}" class="input mono" value="{{ value }}"
+           placeholder="/absolute/path" {% if required %}required{% endif %}
+           aria-describedby="{{ name }}_helper">
+    <button type="button" class="btn btn-ghost btn-sm"
+            data-browse data-target="#{{ name }}" data-kind="{{ browse_kind }}"
+            data-start="{{ value }}">
+      {{ icon('folder-open') }} {{ browse_label }}
+    </button>
+  </div>
+  <div class="helper" id="{{ name }}_helper">{{ helper }}</div>
+  {%- if error %}<div class="error">{{ error }}</div>{% endif %}
+</div>
+{%- endmacro %}

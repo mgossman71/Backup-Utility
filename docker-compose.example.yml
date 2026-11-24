@@ -1,0 +1,45 @@
+# Optional Docker Compose deployment for MountGuard Backup.
+#
+# NOTE: Running directly on the Unix host (as root) is the recommended and
+# fully supported path — see README.md. Docker is provided as an OPTIONAL
+# convenience and adds filesystem-mount, ownership, and (on some hosts)
+# SELinux/AppArmor label complexity. Do not force Docker if it fights you.
+#
+# How to expose host paths to the container:
+#   * Bind-mount every source directory you want to back up, e.g.
+#         - /source:/source
+#   * Bind-mount every destination mount you want to write to, e.g.
+#         - /dest:/dest
+#   * The path you pick in the UI must exist INSIDE the container, so the
+#     container path must match the bind-mount target (use identical paths).
+#   * On SELinux/AppArmor hosts add the label option, e.g.
+#         - /source:/source:Z   (private)  or  /source:/source:z  (shared).
+#   * Application state and logs persist in named volumes so restarts keep jobs.
+services:
+  backup-ui:
+    build: .
+    image: mountguard-backup:latest
+    container_name: backup-ui
+    ports:
+      - "8000:8000"          # host port 8000 -> container port 8000
+    environment:
+      BACKUP_UI_HOST: "0.0.0.0"
+      BACKUP_UI_PORT: "8000"
+      BACKUP_UI_STATE_DIR: "/var/lib/backup-ui"
+      BACKUP_UI_LOG_DIR: "/var/log/backup-ui"
+      BACKUP_UI_TIMEZONE: "America/Chicago"
+    volumes:
+      # Persistent application state (SQLite jobs + runs) and logs.
+      - backup_ui_state:/var/lib/backup-ui
+      - backup_ui_logs:/var/log/backup-ui
+      # Add one bind mount per source folder and per destination mount.
+      # Use identical host/container paths so UI selections resolve correctly.
+      - /source:/source
+      - /dest:/dest
+      # Example with SELinux/AppArmor private-label option (uncomment if needed):
+      # - /data:/data:Z
+    restart: unless-stopped
+
+volumes:
+  backup_ui_state:
+  backup_ui_logs:

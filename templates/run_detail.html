@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon, empty_art %}
+{% from "components/status.html" import status_pill %}
+{% from "partials/log_panel.html" import log_panel %}
+{% block title %}{{ copy.run_history }} · {{ brand_name }}{% endblock %}
+{% block body %}
+  <div class="page-head">
+    <span class="crumb">
+      <a href="/">{{ copy.dashboard }}</a> {{ icon('chevron') }} {{ copy.run_history }}
+    </span>
+    <span class="spacer"></span>
+    {% if run %}{{ status_pill(run.status) }}{% endif %}
+  </div>
+
+  {% if not run %}
+    <section class="card">
+      <div class="empty-state">
+        {{ empty_art('stack') }}
+        <p>{{ copy.status_no_runs }}</p>
+      </div>
+    </section>
+  {% else %}
+    <section class="card">
+      <div class="card-head">
+        <h2>{{ run.operation | capitalize }}</h2>
+        <div class="card-actions">
+          <a class="btn btn-ghost btn-sm" href="/jobs/{{ run.job_id }}">{{ icon('arrow-right') }} {{ copy.cta_back_to_jobs }}</a>
+        </div>
+      </div>
+      <dl class="defs">
+        <dt>{{ copy.job_details }}</dt>
+        <dd>{{ copy.status_last_run }}: {{ status_pill(run.status) }}</dd>
+
+        <dt>Source</dt>
+        <dd class="path">{{ run.source_path }}</dd>
+
+        <dt>Destination</dt>
+        <dd class="path">{{ run.destination_path }}</dd>
+
+        <dt>Started</dt>
+        <dd class="mono">{{ run.started_at }}</dd>
+
+        <dt>Finished</dt>
+        <dd class="mono">{{ run.finished_at or "—" }}</dd>
+
+        <dt>Duration</dt>
+        <dd class="mono">
+          {%- if run.duration_seconds is not none %}{{ (run.duration_seconds) | round(2) }}s{% else %}{{ copy.status_running_now }}{% endif -%}
+        </dd>
+
+        <dt>Exit code</dt>
+        <dd class="mono">{% if run.exit_code is not none %}{{ run.exit_code }}{% else %}—{% endif %}</dd>
+
+        <dt>Files transferred</dt>
+        <dd class="mono">{{ run.stats.get('files_transferred', '—') }}</dd>
+
+        <dt>Bytes transferred</dt>
+        <dd class="mono">{{ run.stats.get('bytes_transferred', '—') }}</dd>
+
+        <dt>Message</dt>
+        <dd>{{ run.message or "—" }}</dd>
+      </dl>
+    </section>
+
+    <section style="margin-top:var(--section-gap)">
+      {{ log_panel(log_lines, title='Run Log', refresh=True, refresh_url='/runs/' ~ run.id ~ '/log') }}
+    </section>
+  {% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/js/log.js" defer></script>{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon, empty_art, sparkline %}
+{% from "components/status.html" import status_pill %}
+{% block title %}{{ copy.job_details }} · {{ brand_name }}{% endblock %}
+{% block body %}
+  <div class="page-head">
+    <span class="crumb">
+      <a href="/jobs">{{ copy.backup_jobs }}</a> {{ icon('chevron') }}
+      {% if job %}{{ job.name }}{% else %}{{ copy.job_details }}{% endif %}
+    </span>
+    <span class="spacer"></span>
+    {% if job %}{{ status_pill(status) }}{% endif %}
+  </div>
+
+  {% if not job %}
+    <section class="card"><div class="empty-state">{{ empty_art('stack') }}<p>{{ copy.job_details }}</p></div></section>
+  {% else %}
+    <section class="card job-card">
+      <div class="card-head">
+        <h2>{{ job.name }}</h2>
+        <div class="card-actions">
+          <form method="post" action="/jobs/{{ job.id }}/run" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-primary btn-sm" type="submit">{{ icon('play') }} {{ copy.cta_run_job_now }}</button>
+          </form>
+          <a class="btn btn-ghost btn-sm" href="/jobs/{{ job.id }}/edit">{{ icon('chevron') }} {{ copy.cta_edit_job }}</a>
+          <a class="btn btn-ghost btn-sm" href="/jobs/{{ job.id }}/restore">{{ icon('restore') }} {{ copy.cta_restore_files }}</a>
+        </div>
+      </div>
+
+      <dl class="defs">
+        <dt>{{ copy.label_source }}</dt><dd class="path">{{ job.source_path }}</dd>
+        <dt>{{ copy.label_destination }}</dt><dd class="path">{{ job.dest_path() }}</dd>
+        <dt>{{ copy.label_schedule }}</dt>
+        <dd>
+          {% if job.schedule_cron %}<span class="mono">{{ job.schedule_cron }}</span> · {{ job.timezone }}
+          {% else %}{{ copy.no_schedule_set }}{% endif %}
+        </dd>
+        <dt>{{ copy.field_next_run }}</dt>
+        <dd>{% if next_run %}<span class="mono">{{ next_run }}</span>{% else %}—{% endif %}</dd>
+        <dt>{{ copy.label_status }}</dt>
+        <dd>{% if job.enabled %}<span class="pill pill-primary">{{ copy.label_enabled }}</span>{% else %}<span class="pill pill-muted">{{ icon('lock') }} Disabled</span>{% endif %}</dd>
+        <dt>{{ copy.exclusions }}</dt>
+        <dd>
+          {% if job.exclusions %}
+            {%- for e in job.exclusions %}<span class="tag">{{ e }}</span> {% endfor -%}
+          {% else %}—{% endif %}
+        </dd>
+      </dl>
+
+      <div style="margin-top:14px">{{ sparkline(spark) }}</div>
+    </section>
+
+    <section class="card" style="margin-top:var(--section-gap)">
+      <div class="card-head"><h3>{{ copy.run_history }}</h3></div>
+      {% if runs %}
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>{{ copy.label_status }}</th><th>Started</th><th>{{ copy.label_duration }}</th><th>Files</th><th>Exit</th></tr></thead>
+            <tbody>
+              {%- for r in runs %}
+              <tr>
+                <td><a href="/runs/{{ r.id }}">{{ status_pill(r.status) }}</a></td>
+                <td class="mono">{{ r.started_at }}</td>
+                <td class="mono">{% if r.duration_seconds is not none %}{{ r.duration_seconds | round(2) }}s{% else %}{{ copy.status_running_now }}{% endif %}</td>
+                <td class="mono">{{ r.stats.get('files_transferred', '—') }}</td>
+                <td class="mono">{% if r.exit_code is not none %}{{ r.exit_code }}{% else %}—{% endif %}</td>
+              </tr>
+              {%- endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">{{ empty_art('stack') }}<p>{{ copy.status_no_runs }}</p></div>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

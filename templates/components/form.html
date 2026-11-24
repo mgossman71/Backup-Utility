@@ -1,0 +1,45 @@
+{# form.html — reusable custom-styled form field macros #}
+{% macro text_field(name, label, value='', helper='', required=False, type='text', cls='input', placeholder='') -%}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <input id="{{ name }}" name="{{ name }}" type="{{ type }}" class="{{ cls }}"
+         value="{{ value }}"{% if required %} required{% endif %}
+         {% if placeholder %} placeholder="{{ placeholder }}"{% endif %}>
+  {% if helper %}<div class="helper">{{ helper }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro textarea_field(name, label, value='', helper='', required=False, cls='textarea mono', rows=4) -%}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <textarea id="{{ name }}" name="{{ name }}" class="{{ cls }}" rows="{{ rows }}"
+            {% if required %}required{% endif %}>{{ value }}</textarea>
+  {% if helper %}<div class="helper">{{ helper }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro select_field(name, label, options, selected='', helper='') -%}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <div class="select-wrap">
+    <select id="{{ name }}" name="{{ name }}" class="select">
+      {%- for opt in options %}
+        {%- set oval = opt.value if opt is mapping else opt %}
+        {%- set olab = opt.label if opt is mapping else opt %}
+        <option value="{{ oval }}"{% if oval == selected %} selected{% endif %}>{{ olab }}</option>
+      {%- endfor %}
+    </select>
+  </div>
+  {% if helper %}<div class="helper">{{ helper }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro check_field(name, label, checked=False, helper='', value='1') -%}
+<div class="field">
+  <label class="check">
+    <input type="checkbox" name="{{ name }}" value="{{ value }}"{% if checked %} checked{% endif %}>
+    <span class="check-label">{{ label }}</span>
+  </label>
+  {% if helper %}<div class="helper">{{ helper }}</div>{% endif %}
+</div>
+{%- endmacro %}

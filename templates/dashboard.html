@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon, empty_art, sparkline %}
+{% from "components/status.html" import status_pill %}
+{% block title %}{{ copy.dashboard }} · {{ brand_name }}{% endblock %}
+{% block body %}
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>{{ copy.hero_headline }}</h1>
+      <p class="lede">{{ copy.hero_subhead }}</p>
+      <div class="hero-metrics">
+        <div class="hero-metric"><div class="n">{{ metrics.total }}</div><div class="l">{{ copy.label_total_jobs }}</div></div>
+        <div class="hero-metric"><div class="n">{{ metrics.scheduled }}</div><div class="l">{{ copy.label_scheduled }}</div></div>
+        <div class="hero-metric"><div class="n">{{ metrics.running }}</div><div class="l">{{ copy.label_running_now }}</div></div>
+        <div class="hero-metric"><div class="n">{{ metrics.recent }}</div><div class="l">{{ copy.label_last_runs }}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-head">
+    <h2>{{ copy.backup_jobs }}</h2>
+    <span class="spacer"></span>
+    <a class="btn btn-primary" href="/jobs/new">{{ icon('plus') }} {{ copy.cta_create_backup_job }}</a>
+  </div>
+
+  {% if cards %}
+    <div class="jobs-grid">
+      {% for c in cards %}
+        <article class="card job-card">
+          <div class="job-title">
+            <a href="/jobs/{{ c.job.id }}" style="color:inherit">{{ c.job.name }}</a>
+            <span class="spacer"></span>
+            {{ status_pill(c.status) }}
+          </div>
+          <div class="flow">
+            <span class="path">{{ c.job.source_path }}</span>
+            <span class="arrow">{{ icon('arrow-right') }}</span>
+            <span class="path">{{ c.job.dest_path() }}</span>
+          </div>
+          {{ sparkline(c.spark) }}
+          <div class="row split" style="display:flex;align-items:center;gap:10px">
+            <div class="text-xs text-muted">
+              {% if c.next_run %}{{ icon('clock', 'icon-xs') }} {{ copy.field_next_run }}: <span class="mono">{{ c.next_run }}</span>
+              {% elif c.job.enabled %}{{ copy.no_schedule_set }}
+              {% else %}<span class="pill pill-muted">{{ icon('lock') }} Disabled</span>{% endif %}
+            </div>
+          </div>
+          <div class="btn-row">
+            <form method="post" action="/jobs/{{ c.job.id }}/run" style="display:inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="btn btn-primary btn-sm" type="submit">{{ icon('play') }} {{ copy.cta_run_job_now }}</button>
+            </form>
+            <a class="btn btn-ghost btn-sm" href="/jobs/{{ c.job.id }}/edit">{{ icon('chevron') }} {{ copy.cta_edit_job }}</a>
+            <span class="spacer"></span>
+            <form method="post" action="/jobs/{{ c.job.id }}/delete" style="display:inline"
+                  data-confirm="{{ copy.cta_delete_job }}"
+                  data-confirm-message="This removes the job record only. Source and backup files are left untouched."
+                  data-confirm-label="{{ copy.cta_confirm_job_deletion }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="btn btn-danger-outline btn-sm" type="submit">{{ icon('delete') }} {{ copy.cta_delete_job }}</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="card">
+      <div class="empty-state">
+        {{ empty_art('stack') }}
+        <h3>{{ copy.empty_jobs_title }}</h3>
+        <p>{{ copy.empty_jobs_body }}</p>
+        <a class="btn btn-primary" href="/jobs/new">{{ icon('plus') }} {{ copy.cta_create_backup_job }}</a>
+        <div class="kv-inline" style="margin-top:14px">
+          {{ status_pill('no_runs') }} {{ status_pill('scheduled') }} {{ status_pill('running') }} {{ status_pill('success') }} {{ status_pill('failure') }}
+        </div>
+        <pre class="mono text-dim" style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:8px">source: /srv/data/…
+destination: /mnt/backups/…
+schedule: 0 2 * * *  (02:00 Central)</pre>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}
