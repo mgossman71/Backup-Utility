@@ -25,6 +25,11 @@ class Job:
     dest_name_override: str | None = None
     enabled: bool = True
     schedule_cron: str | None = None
+    schedule_kind: str = "none"            # none | interval | cron (legacy)
+    schedule_start_date: str | None = None  # YYYY-MM-DD
+    schedule_run_time: str | None = None    # HH:MM
+    schedule_interval_value: int | None = None
+    schedule_interval_unit: str | None = None  # minutes | hours | days | weeks
     timezone: str = "America/Chicago"
     delete_mode: bool = False
     checksum_mode: bool = False
@@ -35,6 +40,11 @@ class Job:
 
     @classmethod
     def from_row(cls, row: sqlite3.Row) -> "Job":
+        keys = set(row.keys())
+
+        def g(key, default=None):
+            return row[key] if key in keys else default
+
         return cls(
             id=row["id"],
             name=row["name"],
@@ -42,7 +52,12 @@ class Job:
             dest_root=row["dest_root"],
             dest_name_override=row["dest_name_override"],
             enabled=bool(row["enabled"]),
-            schedule_cron=row["schedule_cron"],
+            schedule_cron=g("schedule_cron"),
+            schedule_kind=g("schedule_kind", "none") or "none",
+            schedule_start_date=g("schedule_start_date"),
+            schedule_run_time=g("schedule_run_time"),
+            schedule_interval_value=g("schedule_interval_value"),
+            schedule_interval_unit=g("schedule_interval_unit"),
             timezone=row["timezone"],
             delete_mode=bool(row["delete_mode"]),
             checksum_mode=bool(row["checksum_mode"]),

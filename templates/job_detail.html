@@ -33,7 +33,7 @@
         <dt>{{ copy.label_destination }}</dt><dd class="path">{{ job.dest_path() }}</dd>
         <dt>{{ copy.label_schedule }}</dt>
         <dd>
-          {% if job.schedule_cron %}<span class="mono">{{ job.schedule_cron }}</span> · {{ job.timezone }}
+          {% if schedule_desc != 'Not scheduled' %}{{ schedule_desc }} · {{ job.timezone }}
           {% else %}{{ copy.no_schedule_set }}{% endif %}
         </dd>
         <dt>{{ copy.field_next_run }}</dt>

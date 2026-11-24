@@ -29,9 +29,10 @@ def create_job(job: Job) -> Job:
             """
             INSERT INTO jobs (
                 id, name, source_path, dest_root, dest_name_override, enabled,
-                schedule_cron, timezone, delete_mode, checksum_mode,
-                metadata_mode, exclusions_json, created_at, updated_at
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                schedule_cron, schedule_kind, schedule_start_date, schedule_run_time,
+                schedule_interval_value, schedule_interval_unit, timezone, delete_mode,
+                checksum_mode, metadata_mode, exclusions_json, created_at, updated_at
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             (
                 job.id,
@@ -41,6 +42,11 @@ def create_job(job: Job) -> Job:
                 job.dest_name_override,
                 1 if job.enabled else 0,
                 job.schedule_cron,
+                job.schedule_kind,
+                job.schedule_start_date,
+                job.schedule_run_time,
+                job.schedule_interval_value,
+                job.schedule_interval_unit,
                 job.timezone,
                 1 if job.delete_mode else 0,
                 1 if job.checksum_mode else 0,
@@ -82,8 +88,10 @@ def update_job(job: Job) -> Job:
             """
             UPDATE jobs SET
                 name=?, source_path=?, dest_root=?, dest_name_override=?,
-                enabled=?, schedule_cron=?, timezone=?, delete_mode=?,
-                checksum_mode=?, metadata_mode=?, exclusions_json=?, updated_at=?
+                enabled=?, schedule_cron=?, schedule_kind=?, schedule_start_date=?,
+                schedule_run_time=?, schedule_interval_value=?, schedule_interval_unit=?,
+                timezone=?, delete_mode=?, checksum_mode=?, metadata_mode=?,
+                exclusions_json=?, updated_at=?
             WHERE id=?
             """,
             (
@@ -93,6 +101,11 @@ def update_job(job: Job) -> Job:
                 job.dest_name_override,
                 1 if job.enabled else 0,
                 job.schedule_cron,
+                job.schedule_kind,
+                job.schedule_start_date,
+                job.schedule_run_time,
+                job.schedule_interval_value,
+                job.schedule_interval_unit,
                 job.timezone,
                 1 if job.delete_mode else 0,
                 1 if job.checksum_mode else 0,

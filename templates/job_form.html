@@ -60,12 +60,55 @@
 
     <section class="card" style="margin-top:var(--row-gap)">
       <div class="card-head"><h3>{{ copy.schedule }}</h3></div>
-      <div class="grid two">
-        {{ select_field('timezone', copy.field_timezone, timezone_options, selected=values.timezone) }}
-        {{ text_field('schedule_cron', copy.field_schedule_cron, value=values.schedule_cron,
-                      cls='input mono', helper=copy.help_schedule_cron, placeholder='0 2 * * *') }}
-      </div>
+
       <div class="field">
+        <label>{{ copy.field_run_frequency }}</label>
+        <div class="switch-row" style="display:flex;flex-wrap:wrap;gap:10px">
+          <label class="switch"><input type="radio" name="schedule_kind" value="none"{% if values.schedule_kind != 'interval' %} checked{% endif %}><span>{{ copy.schedule_never }}</span></label>
+          <label class="switch"><input type="radio" name="schedule_kind" value="interval"{% if values.schedule_kind == 'interval' %} checked{% endif %}><span>{{ copy.schedule_scheduled }}</span></label>
+        </div>
+      </div>
+
+      <div data-group="interval"{% if values.schedule_kind != 'interval' %} hidden{% endif %}>
+        <div class="grid two" style="margin-top:12px">
+          <div class="field">
+            <label for="schedule_start_date">{{ copy.field_start_date }}</label>
+            <input class="input" type="date" id="schedule_start_date" name="schedule_start_date"
+                   value="{{ values.schedule_start_date }}"
+                   {% if error_field == 'schedule_interval_value' %}aria-invalid="true"{% endif %}>
+          </div>
+          <div class="field">
+            <label for="schedule_run_time">{{ copy.field_run_time }}</label>
+            <input class="input" type="time" id="schedule_run_time" name="schedule_run_time" step="60" value="{{ values.schedule_run_time }}">
+          </div>
+        </div>
+
+        <div class="grid two" style="margin-top:12px">
+          <div class="field">
+            <label>{{ copy.field_repeat_every }}</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span>{{ copy.schedule_every }}</span>
+              <input class="input" type="number" id="schedule_interval_value" name="schedule_interval_value"
+                     min="1" max="1000" style="max-width:90px" value="{{ values.schedule_interval_value }}"
+                     {% if error_field == 'schedule_interval_value' %}aria-invalid="true"{% endif %}>
+              <div class="select-wrap">
+                <select class="select" name="schedule_interval_unit" aria-label="{{ copy.field_repeat_every }}">
+                  {% for u in interval_unit_options %}
+                    <option value="{{ u.value }}"{% if u.value == values.schedule_interval_unit %} selected{% endif %}>{{ u.label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          {{ select_field('timezone', copy.field_timezone, timezone_options, selected=values.timezone) }}
+        </div>
+
+        <div class="field" style="margin-top:10px">
+          <div class="helper" id="schedulePreview"></div>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:12px">
         <div class="helper">{{ copy.field_next_run }}:
           {% if next_run %}<span class="mono">{{ next_run }}</span>{% else %}{{ copy.no_schedule_set }}{% endif %}
         </div>
@@ -108,4 +151,4 @@
     </div>
   {% endif %}
 {% endblock %}
-{% block scripts %}<script src="/static/js/browse.js" defer></script>{% endblock %}
+{% block scripts %}<script src="/static/js/browse.js" defer></script><script src="/static/js/schedule.js" defer></script>{% endblock %}

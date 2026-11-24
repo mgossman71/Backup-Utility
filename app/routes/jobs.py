@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 
 from .. import repositories, views
 from ..security import verify_csrf
-from ..services import job_service, scheduler
+from ..services import job_service, schedule, scheduler
 from ..services.job_service import JobValidationError
 from ..services.timezones import TIMEZONE_OPTIONS
 from ..templating import render
@@ -28,6 +28,7 @@ def _form_response(request, *, job, data, exc, is_new):
             "is_new": is_new,
             "values": values,
             "timezone_options": TIMEZONE_OPTIONS,
+            "interval_unit_options": schedule.INTERVAL_UNITS,
             "next_run": views.next_run_view(job) if job else "",
             "error": exc.message,
             "error_field": exc.field,
@@ -68,6 +69,7 @@ async def job_new(request: Request):
             "is_new": True,
             "values": views.form_values(None, None),
             "timezone_options": TIMEZONE_OPTIONS,
+            "interval_unit_options": schedule.INTERVAL_UNITS,
             "next_run": "",
             "error": None,
             "error_field": None,
@@ -99,6 +101,7 @@ async def job_edit(job_id: str, request: Request):
             "is_new": False,
             "values": views.form_values(job, None),
             "timezone_options": TIMEZONE_OPTIONS,
+            "interval_unit_options": schedule.INTERVAL_UNITS,
             "next_run": views.next_run_view(job),
             "error": None,
             "error_field": None,

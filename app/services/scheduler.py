@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 
 from .. import config, repositories
 from . import executor, schedule
@@ -61,15 +60,14 @@ def register_job(job) -> None:
     existing = _scheduler.get_job(job.id)
     if existing:
         _scheduler.remove_job(job.id)
-    if not job.enabled or not job.schedule_cron:
+    if not job.enabled:
         return
     try:
-        schedule.validate_cron(job.schedule_cron)
-        trigger = CronTrigger.from_crontab(
-            job.schedule_cron, timezone=normalize_timezone(job.timezone)
-        )
-    except (schedule.CronError, Exception) as exc:  # noqa: BLE001
+        trigger = schedule.make_trigger(job)
+    except Exception as exc:  # noqa: BLE001
         logger.warning("Not scheduling job '%s': %s", job.name, exc)
+        return
+    if trigger is None:
         return
     _scheduler.add_job(
         _scheduled_run,
@@ -96,9 +94,9 @@ def load_jobs() -> None:
 
 def next_run_time(job) -> str | None:
     """Return the trigger's next fire time (tz-aware ISO) for display, or None."""
-    if not job.enabled or not job.schedule_cron:
+    if not job.enabled:
         return None
-    dt = schedule.next_run(job.schedule_cron, job.timezone)
+    dt = schedule.next_run_for_job(job)
     return dt.isoformat() if dt else None
 
 

@@ -107,12 +107,41 @@ def validate_and_build(data: dict, existing: Job | None = None) -> Job:
                 field="confirm_dest_inside_source",
             )
 
-    # Schedule + timezone.
-    cron = (data.get("schedule_cron") or "").strip() or None
-    try:
-        schedule.validate_cron(cron)
-    except schedule.CronError as exc:
-        raise JobValidationError(str(exc), field="schedule_cron") from exc
+    # Schedule: friendly interval (start date + time + every N units). A legacy
+    # request that posts a raw schedule_cron (API/older jobs) is still honored.
+    sched_kind = (data.get("schedule_kind") or "").strip()
+    has_legacy_cron = bool((data.get("schedule_cron") or "").strip())
+    schedule_cron = None
+    start_date = run_time = interval_unit = None
+    interval_value = None
+
+    if not sched_kind and has_legacy_cron:
+        # Legacy/API path: raw cron string.
+        sched_kind = "cron"
+
+    if sched_kind == "interval":
+        try:
+            spec = schedule.build_interval_spec(
+                data.get("schedule_start_date") or "",
+                data.get("schedule_run_time") or "",
+                data.get("schedule_interval_value") or "",
+                (data.get("schedule_interval_unit") or "").strip(),
+            )
+        except schedule.ScheduleError as exc:
+            raise JobValidationError(str(exc), field="schedule_interval_value") from exc
+        start_date = spec["start_date"]
+        run_time = spec["run_time"]
+        interval_value = spec["value"]
+        interval_unit = spec["unit"]
+    elif sched_kind == "cron":
+        schedule_cron = (data.get("schedule_cron") or "").strip() or None
+        try:
+            schedule.validate_cron(schedule_cron)
+        except schedule.CronError as exc:
+            raise JobValidationError(str(exc), field="schedule_cron") from exc
+    else:  # "none" or unspecified
+        sched_kind = "none"
+
     try:
         tz = normalize_timezone(data.get("timezone"))
     except ValueError as exc:
@@ -132,7 +161,12 @@ def validate_and_build(data: dict, existing: Job | None = None) -> Job:
     job.dest_root = dest_root.rstrip("/") or "/"
     job.dest_name_override = (data.get("dest_name_override") or "").strip() or None
     job.enabled = _as_bool(data.get("enabled"), default=True)
-    job.schedule_cron = cron
+    job.schedule_kind = sched_kind
+    job.schedule_cron = schedule_cron
+    job.schedule_start_date = start_date
+    job.schedule_run_time = run_time
+    job.schedule_interval_value = interval_value
+    job.schedule_interval_unit = interval_unit
     job.timezone = tz
     job.delete_mode = delete_mode
     job.checksum_mode = _as_bool(data.get("checksum_mode"))

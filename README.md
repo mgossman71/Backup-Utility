@@ -60,8 +60,9 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
    checkbox tree to **exclude** subfolders (they land in *Exclusions*).
 3. **Destination path** — where the backup is written (Browse Destination). It may
    be a path that doesn't exist yet if its parent is writable (confirm to create it).
-4. **Schedule** — pick a timezone and a cron expression (`0 2 * * *` = 02:00
-   daily in that zone). The dashboard shows the next run time.
+4. **Schedule** — pick a start date, a time of day, and how often it repeats
+   (every N minutes / hours / days / weeks). No cron knowledge needed — the
+   dashboard shows the next run time. Or choose "only when I run it manually".
 5. **Options** — metadata / checksum / delete-mode (mirror), then **Save Job**.
 6. **Run Job Now** or wait for the schedule. Click a run for full `rsync` logs.
 

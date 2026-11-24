@@ -39,7 +39,7 @@
           {{ sparkline(c.spark) }}
           <div class="row split" style="display:flex;align-items:center;gap:10px">
             <div class="text-xs text-muted">
-              {% if c.next_run %}{{ icon('clock', 'icon-xs') }} {{ copy.field_next_run }}: <span class="mono">{{ c.next_run }}</span>
+              {% if c.job.enabled and c.schedule_desc != 'Not scheduled' %}{{ icon('clock', 'icon-xs') }} {{ c.schedule_desc }}{% if c.next_run %} · {{ copy.field_next_run }} <span class="mono">{{ c.next_run }}</span>{% endif %}
               {% elif c.job.enabled %}{{ copy.no_schedule_set }}
               {% else %}<span class="pill pill-muted">{{ icon('lock') }} Disabled</span>{% endif %}
             </div>
@@ -74,7 +74,7 @@
         </div>
         <pre class="mono text-dim" style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:8px">source: /srv/data/…
 destination: /mnt/backups/…
-schedule: 0 2 * * *  (02:00 Central)</pre>
+schedule: every day at 02:00</pre>
       </div>
     </section>
   {% endif %}

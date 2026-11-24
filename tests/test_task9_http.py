@@ -63,7 +63,7 @@ def test_job_detail_and_edit(client, tmp_path):
     r = client.get(loc)
     assert r.status_code == 200
     assert "Detail" in r.text
-    assert "0 2 * * *" in r.text
+    assert "Every day at 2:00 AM" in r.text  # human-readable schedule, not raw cron
     edit = client.get(loc + "/edit")
     assert edit.status_code == 200
     assert 'value="' + str(src) + '"' in edit.text

@@ -9,6 +9,11 @@ CREATE TABLE IF NOT EXISTS jobs (
     dest_name_override TEXT,
     enabled            INTEGER NOT NULL DEFAULT 1,
     schedule_cron      TEXT,
+    schedule_kind          TEXT NOT NULL DEFAULT 'none',   -- none | interval | cron (legacy)
+    schedule_start_date    TEXT,                           -- YYYY-MM-DD (interval anchor)
+    schedule_run_time      TEXT,                           -- HH:MM  (interval clock)
+    schedule_interval_value INTEGER,                        -- N in "every N units"
+    schedule_interval_unit  TEXT,                           -- minutes | hours | days | weeks
     timezone           TEXT NOT NULL DEFAULT 'America/Chicago',
     delete_mode        INTEGER NOT NULL DEFAULT 0,
     checksum_mode      INTEGER NOT NULL DEFAULT 0,
