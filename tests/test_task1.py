@@ -1,15 +1,10 @@
-"""Task 1 acceptance tests: host/health/root binding, Docker example, CSRF."""
+"""Task 1 acceptance tests: host/health/root binding and CSRF protection."""
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import yaml
 from fastapi import Request
 
 from app import config, security
-
-ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_health_returns_200(client):
@@ -33,25 +28,6 @@ def test_default_bind_host_is_all_interfaces():
 
     os.environ.pop("BACKUP_UI_HOST", None)
     assert config.host() == "0.0.0.0"
-
-
-def test_docker_compose_example_parses_and_maps_port():
-    text = (ROOT / "docker-compose.example.yml").read_text()
-    data = yaml.safe_load(text)
-    assert isinstance(data, dict) and "services" in data
-    service = data["services"]["backup-ui"]
-    ports = service["ports"]
-    assert "8000:8000" in [str(p) for p in ports]
-    # Documents host bind mounts for source and destination paths.
-    assert "/source:/source" in text
-    assert "/dest:/dest" in text
-    # Named volume for application state.
-    assert "backup_ui_state" in text
-
-
-def test_dockerfile_installs_rsync():
-    text = (ROOT / "Dockerfile").read_text()
-    assert "rsync" in text
 
 
 def test_csrf_mismatched_origin_rejected(client):

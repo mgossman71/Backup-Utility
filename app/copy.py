@@ -102,7 +102,3 @@ COPY = {
     "no_schedule_set": "No schedule set",
     "nav_new_job": "New",
 }
-
-
-def get(key: str) -> str:
-    return COPY[key]

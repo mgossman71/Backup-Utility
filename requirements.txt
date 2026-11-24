@@ -4,7 +4,6 @@ jinja2>=3.1,<4.0
 python-multipart>=0.0.9
 apscheduler>=3.10,<4.0
 pytz>=2024.1
-PyYAML>=6.0,<7.0
 
 # Test dependencies
 pytest>=8.0,<9.0

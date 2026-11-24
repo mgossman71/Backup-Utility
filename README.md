@@ -117,12 +117,3 @@ sudo ./uninstall.sh            # remove the service, keep jobs/logs
 sudo ./uninstall.sh --purge    # also delete jobs DB and run logs
 ```
 
----
-
-## Docker (optional)
-
-A `Dockerfile` + `docker-compose.example.yml` exist, but the **native install
-above is the recommended path.** Docker only sees folders you bind-mount, and on
-**macOS Docker Desktop a folder must also be listed in Settings → Resources →
-File Sharing** (which is why mounting `/opt` etc. fails there). For backing up a
-server's own files, just run natively.
